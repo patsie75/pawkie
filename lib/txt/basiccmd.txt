@@ -1,0 +1,68 @@
+## execute/send a basic IRC command to the configured IRC server
+## Usage: basiccmd("nick!user@host.com", "command", "args")
+function basiccmd(cmd, plugin, script, line, lines, output) {
+  dbg(4, "basiccmd", sprintf("\"%s\" \"%s\" \"%s\"", var["user"], var["cmd"], var["args"]))
+
+  cmd = var["cmd"]
+  if (cmd in commands) {
+    dbg(5, "basiccmd", sprintf("found command \"%s\"", cmd))
+    plugin = substr(commands[cmd], 1, index(commands[cmd], ":")-1)
+    script = substr(commands[cmd], index(commands[cmd], ":")+1)
+
+    if (permissions[cmd]) {
+      dbg(5, "basiccmd", sprintf("permissions for command \"%s\" are \"%s\"", cmd, permissions[cmd]))
+      if (isPartOf(var["user"], permissions[cmd])) {
+        dbg(5, "basiccmd", sprintf("user \"%s\" is allowed", var["user"]))
+
+        var["msg"] = token[5]
+        var["cmd"] = substr(token[5], 1, index(token[5], " "))
+        var["args"] = substr(token[5], index(token[5], " ")+1)
+        if (plugin == "irc")
+          send(ircd, vsub(script))
+        else {
+          lines = dyncommand(plugin, vsub(script), var["args"], output)
+          for (line in output) send(ircd, vsub(output[line]))
+        }
+
+      } else dbg(3, "basiccmd", sprintf("\"%s\"; user \"%s\" unauthorized", cmd, var["user"]))
+    } else {
+      var["msg"] = token[5]
+      var["cmd"] = substr(token[5], 1, index(token[5], " "))
+      var["args"] = substr(token[5], index(token[5], " ")+1)
+      if (plugin == "irc")
+        send(ircd, vsub(script))
+      else {
+        lines = dyncommand(plugin, vsub(script), var["args"], output)
+        for (line in output) send(ircd, vsub(output[line]))
+      }
+    }
+  } else dbg(2, "basiccmd", sprintf("\"%s\"; Unknown command", cmd))
+}
+
+
+
+function funcs(fnc, args) {
+  switch(fnc) {
+    case "getvar":
+      return(sprintf("%s[%s] = \"%s\"", label, key, label[key]))
+    break
+
+    case "setvar":
+      if (label[key]) {
+        label[key] = value
+        return(sprintf("%s[%s] changed to \"%s\"", label, key, label[key]))
+      } else {
+        label[key] = value
+        return(sprintf("%s[%s] set to \"%s\"", label, key, label[key]))
+      }
+    break
+
+    case "listvar":
+      for (key in label)
+        s = s " " key
+      return(sprintf("%s:%s", label, s))
+    break
+  } 
+
+}
+

@@ -1,0 +1,23 @@
+ACTION geeft een groot glas Grolsch
+ACTION geeft een groot glas Heineken
+ACTION geeft een groot glas Amstel
+ACTION geeft een groot glas Dommelsch
+ACTION geeft een groot glas Straffe Hendrik
+ACTION geeft een groot glas Duvel
+ACTION geeft een groot glas Hertog Jan
+ACTION geeft een groot glas Witte Raaf
+ACTION geeft een groot glas bokbier
+ACTION geeft een groot glas Leffe Brun
+ACTION geeft een groot glas Murphy's
+ACTION geeft een groot glas Leeuw
+ACTION geeft een groot glas Kanon
+ACTION geeft een groot glas La Chouffe
+ACTION geeft een groot glas Adriaan
+ACTION geeft een groot glas Guiness
+ACTION geeft een groot glas Gulpener
+ACTION geeft een groot glas Korenwolf
+ACTION geeft een groot glas Kilkenny
+ACTION geeft een groot glas Bazuin
+ACTION geeft een groot glas Bariton
+ACTION geeft een groot glas De Koninck
+ACTION geeft een groot glas Brandt
