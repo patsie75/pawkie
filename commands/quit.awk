@@ -1,23 +1,25 @@
 BEGIN {
-  commands["quit"] = "cmd"
-  permissions["quit"] = "admin"
-  timers["quit"] = 600
+  var["commands"]["quit"] = "cmd"
+  var["permissions"]["quit"] = "admin"
+  var["timers"]["quit"] = 600
 
-  help["quit"] = "quits, terminates and ends all life on the planet"
-  usage["quit"] = "quit <msg>"
+  var["aliases"]["die"] = "quit"
+
+  var["help"]["quit"] = "quits, terminates and ends all life on the planet"
+  var["usage"]["quit"] = "quit <msg>"
 }
 
 function _quit(str) {
 
   # save all data
-  saveArray(cfg?cfg:"config.cfg", config)
-  saveArray("plugins.cfg", plugins)
-  saveArray("groups.cfg", groups)
-  saveArray("commands.cfg", commands)
-  saveArray("permissions.cfg", permissions)
-  saveArray("mimic.dat", mimic)
+  saveArray(cfg?cfg:"config.cfg")
+  saveArray("plugins.cfg")
+  saveArray("groups.cfg")
+  saveArray("commands.cfg")
+  saveArray("permissions.cfg")
+  saveArray("mimic.dat")
 
   # Goodbye
-  send(ircd, vsub(sprintf("QUIT :%s", str)))
+  send(var["system"]["ircd"], "QUIT :" str)
 }
 

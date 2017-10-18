@@ -1,64 +1,118 @@
-function var_list(arr, _1, _2,   str, idx) { str = ""; for (idx in arr) str = str?str" "idx:idx; return(str) }
-function var_get(arr, idx, _2) { if (idx in arr) return(arr[idx]); else return("<undefined>") }
-function var_set(arr, idx, value) { return(arr[idx] = value) }
-function var_add(arr, idx, value) { return(arr[idx] = arr[idx] " " value) }
-function var_del(arr, idx, value,   i, tmp) {
-  if (value != "") {
-    split(arr[idx], tmp, " ")
-    arr[idx] = ""
+BEGIN {
+  var["commands"]["var"] = "cmd"
+  var["permissions"]["var"] = "admin"
 
-    for (i in tmp)
-      if (value !~ tmp[i])
-        arr[idx] = arr[idx]?arr[idx]" "tmp[i]:tmp[i]
+  var["aliases"]["get"] = "var get"
+  var["aliases"]["set"] = "var set"
+  var["aliases"]["del"] = "var del"
 
-    return(arr[idx])
+  var["help"]["var"] = "shows or modifies system variables"
+  var["usage"]["var"][2] = "get <key1>[\".\"<key2>[\".\"<etc>]] (show value of key)"
+  var["usage"]["var"][3] = "set <key1>[\".\"<key2>[\".\"<etc>]] <value> (modify key to value)"
+  var["usage"]["var"][4] = "del <key1>[\".\"<key2>[\".\"<etc>]] (deletes key)"
+}
+
+
+function listArray(arr,   result, key) {
+  if (isarray(arr)) {
+    result = ""
+    for (key in arr)
+      # arrays are added as "[array]" scalars as "scalar"
+      if (isarray(arr[key])) result = result?result", ["key"]":"["key"]"
+      else result = result?result", "key:key
+    return("[ "result" ]")
+  } else return("<no array>")
+}
+
+function getValue(arr, keys,   k1, k2) {
+  # k1 is first key, k2 is rest (key1.key2.key3.etc)
+  # k1 is empty and k2 set with only 1 key (key1)
+  k1 = substr(keys, 1, index(keys, ".")-1)
+  k2 = substr(keys, index(keys, ".")+1)
+
+  if (k1) {
+    # itterate over all keys
+    if (isarray(arr)) {
+      if (k1 in arr) {
+        if (isarray(arr[k1])) return(getValue(arr[k1], k2))
+        else return("<\""k1"\" is scalar>")
+      } else return("<invalid key \""k1"\">")
+    } else return("<no array>")
   } else {
-    delete arr[idx]
-    return("<empty>")
+    # display value of final key
+    if (isarray(arr)) {
+      if (k2 in arr) {
+        if (isarray(arr[k2])) return(listArray(arr[k2]))
+        else return(arr[k2])
+      } else return("<invalid key \""k2"\">")
+    } else return("<\""k2"\" is scalar>")
+  }
+} 
+
+function setValue(arr, keys, value,   k1, k2, v) {
+  # k1 is first key, k2 is rest (key1.key2.key3.etc)
+  # k1 is empty and k2 set with only 1 key (key1)
+  k1 = substr(keys, 1, index(keys, ".")-1)
+  k2 = substr(keys, index(keys, ".")+1)
+
+  if (k1) {
+    # itterate over all keys
+    if (isarray(arr)) {
+      if (k1 in arr) {
+        if (isarray(arr[k1])) return(setValue(arr[k1], k2, value))
+        else return("<\""k1"\" is scalar>")
+      } else {
+        # key does not exist yet, create temp array,
+        # assign value and destroy temp value
+        arr[k1]["__placeholder__"] = ""
+        v = setValue(arr[k1], k2, value)
+        delete arr[k1]["__placeholder__"]
+        return(v)
+      }
+    } else return("<no array>")
+  } else {
+    # set value of final key
+    if (isarray(arr)) {
+      if (isarray(arr[k2])) return("<\""k2"\" is array>")
+      else return(arr[k2]=value)
+    } else return("<\""k2"\" is scalar>")
   }
 }
 
-BEGIN {
-  commands["var"] = "cmd"
-  permissions["var"] = "admin|oper"
-  timers["var"] = 5
+function delValue(arr, keys,   k1, k2) {
+  # k1 is first key, k2 is rest (key1.key2.key3.etc)
+  # k1 is empty and k2 set with only 1 key (key1)
+  k1 = substr(keys, 1, index(keys, ".")-1)
+  k2 = substr(keys, index(keys, ".")+1)
 
-  help["var"] = "shows or modifies system variables"
-  usage["var"][1] = "list <group> (list keys in a group)"
-  usage["var"][2] = "get <group> <key> (show value of key in group)"
-  usage["var"][3] = "set <group> <key> <value> (modify key in group to value)"
-  usage["var"][4] = "del <group> <key> (deletes key from group)"
-  
-  split("list get set add del", _var_types, " ")
+  if (k1) {
+    # itterate over all keys
+    if (isarray(arr)) {
+      if (k1 in arr) {
+        if (isarray(arr[k1])) return(delValue(arr[k1], k2))
+        else return("<\""k1"\" is scalar>")
+      } else return("<invalid key \""k1"\">")
+    } else return("<no array>")
+  } else {
+    # delete final key
+    if (k2 in arr) { delete arr[k2]; return("<deleted>") }
+    else return("<invalid key \""k2"\">")
+  }
 }
 
-function _var(args,    argc, argv, call, value) {
-  dbg(5, "_var", sprintf("args: \"%s\"", args))
+function _var(args,    argc, argv) {
+  dbg(5, "var", sprintf("args: \"%s\"", args))
   argc = split(args, argv, " ")
 
   if (argc >= 2) {
-    if (inArray(argv[1], _var_types)) {
-      call = "var_" argv[1]
-      dbg(4, "_var", sprintf("calling function %s(%s, %s, %s)", call, argv[2], argv[3], argv[4]))
-
-      switch( substr(argv[2],1,3) ) {
-        case "cfg":
-        case "con": value = @call(config, argv[3], argv[4]); break
-        case "grp":
-        case "gro": value = @call(groups, argv[3], argv[4]); break
-        case "prm":
-        case "per": value = @call(permissions, argv[3], argv[4]); break
-        case "sv":
-        case "sys": value = @call(sysvar, argv[3], argv[4]); break
-        case "cmd":
-        case "com": value = @call(commands, argv[3], argv[4]); break
-        case "tmr":
-        case "tim": value = @call(timers, argv[3], argv[4]); break
-        default: send(ircd, vsub(sprintf("PRIVMSG $T :Unknown config \"%s\"", argv[2])))
-      }
-      send(ircd, vsub(sprintf("PRIVMSG $T :%s[%s] = %s", argv[2], argv[3], value?value:"<empty>")))
-
-    } else dbg(2, "_var", sprintf("Unknown function var_%s(%s, %s, %s)", argv[1], argv[2], argv[3], argv[4]))
-  } else dbg(2, "_var", sprintf("Too few arguments (#%d < 2)", argc))
-
+    switch(argv[1]) {
+      case "get": return(sprintf("%s = %s", argv[2], getValue(var, argv[2])))
+      case "set": return(sprintf("%s = %s", argv[2], setValue(var, argv[2], argv[3])))
+      case "del": 
+        if ((argv[2] != "config") && (argv[2] != "system"))
+          return(sprintf("%s = %s", argv[2], delValue(var, argv[2])))
+        else return("Sorry, I will not selfdestruct")
+      default: return("Unknown option: "argv[1])
+    }
+  } else dbg(2, "var", sprintf("Too few arguments (#%d < 2)", argc))
 }

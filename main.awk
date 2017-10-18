@@ -11,58 +11,58 @@ BEGIN {
   debug[1] = "ERROR"
   debug[0] = "CRIT"
 
-  config["debuglvl"] = 5
-  #config["debugfnc"] = "loadConfig,tokenize"
+  var["config"]["debuglvl"] = 6
+  #var["config"]["debugfnc"] = "loadConfig,tokenize"
 
   ## load different configs
-  mergeArray(cfg?cfg:"config.cfg", config)
-  mergeArray("plugins.cfg", plugins)
-  mergeArray("groups.cfg", groups)
-  mergeArray("commands.cfg", commands)
-  mergeArray("permissions.cfg", permissions)
-  mergeArray("timers.cfg", timers)
-  loadArray("mimic.dat", mimic)
+  mergeArray(cfg?cfg:"config.cfg")
+  mergeArray("plugins.cfg")
+  mergeArray("groups.cfg")
+  mergeArray("commands.cfg")
+  mergeArray("permissions.cfg")
+  mergeArray("timers.cfg")
+  loadArray("mimic.dat")
 
   ## read "actions" file
-  sysvar["actions"] = tokenize("actions", actions)
+  var["system"]["actions"] = tokenize("actions.cfg")
 
   ## define IRC server connection
-  ircd = "/inet/tcp/0/" config["host"] "/" config["port"]
+  var["system"]["ircd"] = "/inet/tcp/0/" var["config"]["host"] "/" var["config"]["port"]
 
   ## wait for connection to be established
-  sysvar["startup"] = systime()
-  if (recv(ircd) <= 0) {
-    dbg(0, "main", sprintf("Failed to establish connection to %s:%s", config["host"], config["port"]))
+  var["system"]["startup"] = systime()
+  if (recv(var["system"]["ircd"]) <= 0) {
+    dbg(0, "main", sprintf("Failed to establish connection to %s:%s", var["config"]["host"], var["config"]["port"]))
     exit(-1)
   }
 
   ## login
-  system("sleep 1"); send(ircd, "NICK " config["nick"])
-  system("sleep 1"); send(ircd, "USER " config["user"] " 8 * :" config["geco"])
+  system("sleep 1"); send(var["system"]["ircd"], "NICK " var["config"]["nick"])
+  system("sleep 1"); send(var["system"]["ircd"], "USER " var["config"]["user"] " 8 * :" var["config"]["geco"])
 
   ## wait for login process to complete
-  if (recv(ircd) <= 0) {
-    dbg(0, "main", sprintf("Connection to %s:%s closed while logging in", config["host"], config["port"]))
+  if (recv(var["system"]["ircd"]) <= 0) {
+    dbg(0, "main", sprintf("Connection to %s:%s closed while logging in", var["config"]["host"], var["config"]["port"]))
     exit(-1)
   }
 
   ## join channels
-  if (config["channels"]) {
+  if (var["config"]["channels"]) {
     system("sleep 3")
-    split(config["channels"], chan, ",")
+    split(var["config"]["channels"], chan, ",")
     for (c in chan)
-      send(ircd, "JOIN " strip(chan[c]))
+      send(var["system"]["ircd"], "JOIN " strip(chan[c]))
   }
 
   ## main loop
-  while (recv(ircd) > 0) {
-    sysvar["then"] = sysvar["now"]
-    sysvar["now"] = systime()
+  while (recv(var["system"]["ircd"]) > 0) {
+    var["system"]["then"] = var["system"]["now"]
+    var["system"]["now"] = systime()
 
     ## utmost priority, respond to server PING commands
     if ($1 == "PING") {
-      sysvar["lastping"] = sysvar["now"]
-      send(ircd, "PONG " $2)
+      var["system"]["lastping"] = var["system"]["now"]
+      send(var["system"]["ircd"], "PONG " $2)
       continue
     }
 
@@ -70,54 +70,58 @@ BEGIN {
     # :Patsie!patsie@patsie.nl NICK :Petsie
 
     if (match($0, /^:([^ ]+) ([0-9A-Z]+) ([^ ]+)? ?:?(.*)$/, raw)) {
-      var["raw"] = $0
+      # parse input data
+      var["irc"]["raw"] = $0
       parse(raw)
   
-#      dbg(4, "main", sprintf("raw: \"%s\"", var["raw"]))
-#      dbg(5, "main", sprintf("user: %s [%s!%s@%s]", var["user"], var["nick"], var["auth"], var["host"]))
-#      dbg(5, "main", sprintf("target: %s", var["target"]))
-#      dbg(5, "main", sprintf("action: %s", var["action"]))
-#      dbg(5, "main", sprintf("message: %s [%s (%s)]", var["msg"], var["cmd"], var["args"]))
+#      dbg(4, "main", sprintf("raw: \"%s\"", var["irc"]["raw"]))
+#      dbg(5, "main", sprintf("user: %s [%s!%s@%s]", var["irc"]["user"], var["irc"]["nick"], var["irc"]["auth"], var["irc"]["host"]))
+#      dbg(5, "main", sprintf("target: %s", var["irc"]["target"]))
+#      dbg(5, "main", sprintf("action: %s", var["irc"]["action"]))
+#      dbg(5, "main", sprintf("message: %s [%s (%s)]", var["irc"]["msg"], var["irc"]["cmd"], var["irc"]["args"]))
 #      s = "words:"
-#      for (w in varargs) s = s" "w":\""varargs[w]"\""
+#      for (w in var["irc"]["argv"]) s = s" "w":\""var["irc"]["argv"][w]"\""
 #      dbg(5, "main", sprintf("%s", s))
 
-      # handle internal commands first
-      command()
+      # process aliasses first
+      alias()
+
+      # handle internal commands next
+      if (command()) continue
 
       # handle configured actions
       action()
 
       # handle oneliners
-      if (var["cmd"] && var["channel"]) {
-        msg = _onelinerAction(var["cmd"])
-        if (msg) {
-          if (msg ~ /^ACTION/)
-            send(ircd, vsub(sprintf("PRIVMSG $T :\001%s\001", msg)))
+      if (var["irc"]["cmd"] && var["irc"]["channel"]) {
+        out = _onelinerAction(var["irc"]["cmd"])
+        if (out) {
+          if (out ~ /^ACTION/)
+            send(var["system"]["ircd"], vsub(sprintf("PRIVMSG $T :\001%s\001", out)))
           else
-            send(ircd, vsub(sprintf("PRIVMSG $T :%s", msg)))
+            send(var["system"]["ircd"], vsub(sprintf("PRIVMSG $T :%s", out)))
         }
       }
 
       # Add text to mimic library
-      if (!var["cmd"] && var["channel"]) {
-        mimicAddLine(mimic, var["msg"])
-        sysvar["mimiccnt"]++
-        if (sysvar["mimiccnt"] % 100 == 0) {
+      if (!var["irc"]["cmd"] && var["irc"]["channel"]) {
+        mimicAddLine(mimic, var["irc"]["msg"])
+        var["system"]["mimiccnt"]++
+        if (var["system"]["mimiccnt"] % 100 == 0) {
           mimicCleanup()
-          sysvar["mimiccnt"] = 0
+          var["system"]["mimiccnt"] = 0
         }
-        if (sysvar["mimiccnt"] % 10 == 0)
-          saveArray("mimic.dat", mimic)
+        if (var["system"]["mimiccnt"] % 10 == 0)
+          saveArray("mimic.dat")
       }
     }
   }
 
   ## connection terminated
-  close(ircd)
-  printf("main(): Connection to %s:%s closed\n", config["host"], config["port"])
-  printf("main(): Startup %s\n", strftime("%a, %b %d at %T", sysvar["startup"]) )
-  printf("main(): Last ping %s\n", strftime("%a, %b %d at %T", sysvar["lastping"]) )
+  close(var["system"]["ircd"])
+  printf("main(): Connection to %s:%s closed\n", var["config"]["host"], var["config"]["port"])
+  printf("main(): Startup %s\n", strftime("%a, %b %d at %T", var["system"]["startup"]) )
+  printf("main(): Last ping %s\n", strftime("%a, %b %d at %T", var["system"]["lastping"]) )
   printf("main(): Now %s\n", strftime("%a, %b %d at %T",systime()) )
   exit(-1)
 }

@@ -1,7 +1,7 @@
 ## tokenize a file based on the following parser
 ## ON <action> [FROM "%"<group>|<nick>["!"<auth>"@"<host>]] [TO "#"<channel>|<nick>] [SAYING <contents>] [CHANCE <percent>] DO <command>;
-function tokenize(file, actions,   f, line, lnr, nractions, token) {
-  f = config["configdir"] ? config["configdir"]"/"file".cfg" : "./"file".cfg"
+function tokenize(file,   f, line, lnr, nractions, token) {
+  f = var["config"]["configdir"] ? var["config"]["configdir"]"/"file : "./"file
 
   dbg(4, "tokenize", sprintf("file: \"%s\"", f))
   IGNORECASE = 1
@@ -25,7 +25,7 @@ function tokenize(file, actions,   f, line, lnr, nractions, token) {
       gsub(/^\s*"|"\s*$/, "", token[10])
 
       # add action to list, with unique separator
-      actions[nractions] = token[1] "\001" token[3] "\001" token[5] "\001" token[7] "\001" token[9] "\001" token[10]
+      var["actions"][nractions] = token[1] "\001" token[3] "\001" token[5] "\001" token[7] "\001" token[9] "\001" token[10]
       dbg(4, "tokenize", sprintf("ON [%s] FROM [%s] TO [%s] SAYING [%s] CHANCE [%s] DO [%s]", token[1], token[3], token[5], token[7], token[9], token[10]))
     } else {
       # generate message on malformed line

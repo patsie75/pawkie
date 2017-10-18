@@ -1,17 +1,17 @@
 BEGIN {
-  commands["mimic"] = "cmd"
-  permissions["mimic"] = "admin|oper|friend"
-  timers["mimic"] = 10
+  var["commands"]["mimic"] = "cmd"
+  var["permissions"]["mimic"] = "admin|oper|friend"
+  var["timers"]["mimic"] = 10
 
-  help["mimic"] = "Immitate the users on the channel"
-  usage["mimic"] = "mimic"
+  var["help"]["mimic"] = "Immitate the users on the channel"
+  var["usage"]["mimic"] = "mimic"
 }
 
 
 ## Return a random sentence from a mimic dictionary
 function _mimic(    min, max, sentence, key, word, nrwords, arr) {
-  min = config["mimicminwords"] ? int(config["mimicminwords"]) : 10
-  max = config["mimicmaxwords"] ? int(config["mimicmaxwords"]) : 15
+  min = var["config"]["mimicminwords"] ? int(var["config"]["mimicminwords"]) : 10
+  max = var["config"]["mimicmaxwords"] ? int(var["config"]["mimicmaxwords"]) : 15
   sentence = ""
   key = randkey(mimic)
 
@@ -25,10 +25,10 @@ function _mimic(    min, max, sentence, key, word, nrwords, arr) {
     word = arr[randkey(arr)]
     sentence = sentence ? sentence" "word : word
     key = word
-    dbg(6, "mimic", sprintf("word: %s, sentence %s", word, sentence))
+    dbg(6, "mimic", sprintf("word: \"%s\" sentence: \"%s\"", word, sentence))
   }
 
-  dbg(5, "mimic", sprintf("sentence: %s", sentence))
+  dbg(5, "mimic", sprintf("sentence: \"%s\"", sentence))
   return(sentence)
 }
 
@@ -36,8 +36,8 @@ function _mimic(    min, max, sentence, key, word, nrwords, arr) {
 ## Split a line into words and add then to a mimic dictionary (uses: config[])
 function mimicAddLine(dict, line,   i, n, min, max, word, words, key) {
   dbg(5, "mimicAddLine", sprintf("line: %s", line))
-  min = config["mimicminlen"] ? int(config["mimicminlen"]) : 2
-  max = config["mimicmaxlen"] ? int(config["mimicmaxlen"]) : 20
+  min = var["config"]["mimicminlen"] ? int(var["config"]["mimicminlen"]) : 2
+  max = var["config"]["mimicmaxlen"] ? int(var["config"]["mimicmaxlen"]) : 20
 
   ## Strip non-alpha chars from input and split into array
   gsub(/[^[:alnum:] ]/, "", line)

@@ -2,26 +2,26 @@
 ## Usage: dbg(4, "callingFunction", "message")
 function dbg(level, fnc, msg,   fncs) {
   # only debug functions configured in config["debugfnc"]
-  if (config["debugfnc"]) {
+  if (var["config"]["debugfnc"]) {
     # ! negates the debugfnc list
-    if ( substr(config["debugfnc"], 1, 1) == "!" ) {
+    if ( substr(var["config"]["debugfnc"], 1, 1) == "!" ) {
       negate = 1
-      split(tolower(substr(config["debugfnc"], 2)), fncs, ",")
+      split(tolower(substr(var["config"]["debugfnc"], 2)), fncs, ",")
     } else {
       negate = 0
-      split(tolower(config["debugfnc"]), fncs, ",")
+      split(tolower(var["config"]["debugfnc"]), fncs, ",")
     }
 
     if (negate) {
-      if ( (config["debuglvl"] >= level) && ! inArray(tolower(fnc), fncs) )
+      if ( (var["config"]["debuglvl"] >= level) && ! inArray(tolower(fnc), fncs) )
         printf("[%s] %-5s: %s(): %s\n", strftime("%T"), debug[level], fnc, msg)
     } else {
-      if ( (config["debuglvl"] >= level) && inArray(tolower(fnc), fncs) )
+      if ( (var["config"]["debuglvl"] >= level) && inArray(tolower(fnc), fncs) )
         printf("[%s] %-5s: %s(): %s\n", strftime("%T"), debug[level], fnc, msg)
     }
   } else {
     # if no config["debugfnc"] is defined do everything
-    if (config["debuglvl"] >= level)
+    if (var["config"]["debuglvl"] >= level)
       printf("[%s] %-5s: %s(): %s\n", strftime("%T"), debug[level], fnc, msg)
   }
 }

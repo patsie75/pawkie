@@ -1,13 +1,13 @@
 BEGIN {
-  commands["oneliners"] = "cmd"
-  permissions["oneliners"] = "admin|oper"
-  timers["oneliners"] = 5
+  var["commands"]["oneliners"] = "cmd"
+  var["permissions"]["oneliners"] = "admin|oper"
+  var["timers"]["oneliners"] = 5
 
-  help["oneliners"] = "oneliners help"
-  usage["oneliners"] = "oneliners [add|del] <oneliner>"
+  var["help"]["oneliners"] = "oneliners help"
+  var["usage"]["oneliners"] = "oneliners [add|del] <oneliner>"
 
-  commands["onelinerAction"] = "cmd"
-  permissions["onelinerAction"] = "bot"
+  var["commands"]["onelinerAction"] = "cmd"
+  var["permissions"]["onelinerAction"] = "bot"
 }
 
 
@@ -22,25 +22,25 @@ function _oneliners(str,    reply, cmd, args, arr, i) {
   switch(cmd) {
     case "add":
       if (loadText(args)) {
-        config["oneliners"] = config["oneliners"] " " args
+        var["config"]["oneliners"] = var["config"]["oneliners"] " " args
         reply = "Added oneliner \""args"\""
       } else reply = "Failed to add oneliner \""args"\""
     break
 
     case "del":
     case "delete":
-      split(config["oneliners"], arr, " ")
+      split(var["config"]["oneliners"], arr, " ")
       if (inArray(args, arr)) {
-        config["oneliners"] = ""
+        var["config"]["oneliners"] = ""
         for (i in arr)
           if (arr[i] != args)
-            config["oneliners"] = config["oneliners"] ? config["oneliners"] " " arr[i] : arr[i]
+            var["config"]["oneliners"] = var["config"]["oneliners"] ? var["config"]["oneliners"] " " arr[i] : arr[i]
         reply = "Removed oneliner \""args"\""
       } else reply = "No such oneliner \""args"\""
     break
 
     default:
-      split(config["oneliners"], arr, " ")
+      split(var["config"]["oneliners"], arr, " ")
       for (i in arr)
         reply = "!" arr[i] " " reply
 
@@ -53,12 +53,15 @@ function _oneliners(str,    reply, cmd, args, arr, i) {
 
 
 function _onelinerAction(cmd,   arr, i) {
-  split(config["oneliners"], arr, " ")
+  dbg(5, "onelinerAction", sprintf("cmd: \"%s\"", cmd))
+  split(var["config"]["oneliners"], arr, " ")
 
   for (i in arr) {
     if (cmd == arr[i]) {
+      dbg(5, "onelinerAction", sprintf("found match for cmd: \"%s\"", cmd))
       if (!data[cmd,0]) loadText(cmd)
       rnd = int(rand() * data[cmd,0]) + 1
+      dbg(5, "onelinerAction", sprintf("responding: \"%s\"", data[cmd,rnd]))
       return(data[cmd,rnd])
     }
   }

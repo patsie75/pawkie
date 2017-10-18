@@ -39,8 +39,8 @@ function isPartOf(userhost, grps,   i, u, usr, g, grp) {
   if (split(grps, grp, "|") > 0) {
     for (g in grp) {
       # split groups[] into usr elements
-      dbg(6, "isPartOf", sprintf("grp = \"%s\" (%s)", grp[g], groups[grp[g]]))
-      if (split(tolower(groups[grp[g]]), usr, " ") > 0) {
+      dbg(6, "isPartOf", sprintf("grp = \"%s\" (%s)", grp[g], var["groups"][grp[g]]))
+      if (split(tolower(var["groups"][grp[g]]), usr, " ") > 0) {
         for (i in usr) {
           # match userhost to usr from groups[]
           dbg(6, "isPartOf", sprintf("usr[%s] = \"%s\"", i, usr[i]))
@@ -72,25 +72,25 @@ function isPartOf(userhost, grps,   i, u, usr, g, grp) {
 # $1-$9 = first 9 words of (short) message
 function vsub(msg) {
   dbg(6, "vsub", sprintf("pre msg=\"%s\"", msg))
-  gsub(/\$U/, var["user"], msg)
-  gsub(/\$N/, var["nick"], msg)
-  gsub(/\$A/, var["auth"], msg)
-  gsub(/\$H/, var["host"], msg)
-  gsub(/\$T/, var["target"], msg)
-  gsub(/\$I/, var["action"], msg)
-  gsub(/\$C/, var["channel"], msg)
-  gsub(/\$M/, var["msg"], msg)
-  gsub(/\$c/, var["cmd"], msg)
-  gsub(/\$m/, var["args"], msg)
-  gsub(/\$1/, varargs[1], msg)
-  gsub(/\$2/, varargs[2], msg)
-  gsub(/\$3/, varargs[3], msg)
-  gsub(/\$4/, varargs[4], msg)
-  gsub(/\$5/, varargs[5], msg)
-  gsub(/\$6/, varargs[6], msg)
-  gsub(/\$7/, varargs[7], msg)
-  gsub(/\$8/, varargs[8], msg)
-  gsub(/\$9/, varargs[9], msg)
+  gsub(/\$U/, var["irc"]["user"], msg)
+  gsub(/\$N/, var["irc"]["nick"], msg)
+  gsub(/\$A/, var["irc"]["auth"], msg)
+  gsub(/\$H/, var["irc"]["host"], msg)
+  gsub(/\$T/, var["irc"]["target"], msg)
+  gsub(/\$I/, var["irc"]["action"], msg)
+  gsub(/\$C/, var["irc"]["channel"], msg)
+  gsub(/\$M/, var["irc"]["msg"], msg)
+  gsub(/\$c/, var["irc"]["cmd"], msg)
+  gsub(/\$m/, var["irc"]["args"], msg)
+  gsub(/\$1/, var["irc"]["argv"][1], msg)
+  gsub(/\$2/, var["irc"]["argv"][2], msg)
+  gsub(/\$3/, var["irc"]["argv"][3], msg)
+  gsub(/\$4/, var["irc"]["argv"][4], msg)
+  gsub(/\$5/, var["irc"]["argv"][5], msg)
+  gsub(/\$6/, var["irc"]["argv"][6], msg)
+  gsub(/\$7/, var["irc"]["argv"][7], msg)
+  gsub(/\$8/, var["irc"]["argv"][8], msg)
+  gsub(/\$9/, var["irc"]["argv"][9], msg)
   dbg(6, "vsub", sprintf("post msg=\"%s\"", msg))
 
   return(msg)

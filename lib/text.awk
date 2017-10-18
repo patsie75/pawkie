@@ -1,7 +1,7 @@
 # load data from file (uses: config[], creates/modifies: data[])
 function loadText(label,   n, file, t1) {
   n = 0
-  file = config["datadir"] ? config["datadir"]"/"label".txt" : "./"label".txt"
+  file = var["config"]["datadir"] ? var["config"]["datadir"]"/"label".txt" : "./"label".txt"
 
   t1 = preciseTime()
 
