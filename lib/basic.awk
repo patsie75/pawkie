@@ -10,6 +10,14 @@ function inArray(needle, haystack,   x, y) {
 #  return 0
 #}
 
+function rindex(str, idx,  i, n) {
+  if (index(str, idx)) {
+    i = 1
+    while (n = index(substr(str, i), idx)) i += n
+    return(i)
+  } else return(0)
+}
+
 ## return the size of an array
 function sizeof(arr,   n, i) {
   n = 0; for (i in arr) n++;

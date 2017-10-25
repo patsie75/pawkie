@@ -1,31 +1,30 @@
 ## send string to server
-function send(srv, str) {
+function send(str) {
   if ( str !~ /^PONG / )
-    printf("[%s] > %s\n", strftime("%T"), str);
-  print str |& srv;
+    printf("[%s] > %s\n", strftime("%T"), str)
+  print str |& var["system"]["ircd"]
 }
 
-
 ## receive string from server
-function recv(srv,   i, try) {
+function recv(   i, try) {
   try = 1
 
-  if ( (i=(srv |& getline)) > 0 ) {
+  if ( (i=(var["system"]["ircd"] |& getline)) > 0 ) {
 
-#  while ( (i=(srv |& getline)) < 1 && (try <= config["readfails"]?config["readfails"]:4) ) {
-#    dbg(2, "recv", sprintf("read failure #%d from %s", try, srv))
+#  while ( (i=(var["system"]["ircd"] |& getline)) < 1 && (try <= config["readfails"]?config["readfails"]:4) ) {
+#    dbg(2, "recv", sprintf("read failure #%d from %s", try, var["system"]["ircd"]))
 #    system("sleep " try)
 #    try++
 #  }
 #
 #  if (i > 0) {
     if ($0 !~ /^PING /)
-      printf("[%s] < %s\n", strftime("%T"), $0);
+      printf("[%s] < %s\n", strftime("%T"), $0)
 
-    gsub(/\r$/, "", $0);
-  } else dbg(0, "recv", sprintf("lost connection with %s", srv))
+    gsub(/\r$/, "", $0)
+  } else dbg(0, "recv", sprintf("lost connection with %s", var["system"]["ircd"]))
 
-  return(i);
+  return(i)
 }
 
 

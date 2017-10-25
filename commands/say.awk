@@ -16,6 +16,6 @@ function _say(str,   target, msg) {
     msg = str
   }
 
-  send(var["system"]["ircd"], vsub(sprintf("PRIVMSG %s :%s", target, msg)))
+  send(vsub(sprintf("PRIVMSG %s :%s", target, msg)))
 }
 

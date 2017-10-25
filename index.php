@@ -42,7 +42,7 @@ if (!empty($_GET)) {
 </html>
 EOT1;
 } else {
-  foreach (glob("{,config/,commands/,lib/}*.{awk,cfg}", GLOB_BRACE) as $filename) {
+  foreach (glob("{,config/,lib/,commands/}*.{awk,cfg,ini}", GLOB_BRACE) as $filename) {
     //$bname = basename($filename, '.awk');
     //$bname = str_replace("./", "", pathinfo($filename, PATHINFO_DIRNAME) . "/" . pathinfo($filename, PATHINFO_FILENAME));
     $bname = str_replace("./", "", pathinfo($filename, PATHINFO_DIRNAME) . "/" . pathinfo($filename, PATHINFO_BASENAME));

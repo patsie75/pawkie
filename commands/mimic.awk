@@ -9,22 +9,27 @@ BEGIN {
 
 
 ## Return a random sentence from a mimic dictionary
-function _mimic(    min, max, sentence, key, word, nrwords, arr) {
+function _mimic(    min, max, sentence, key, word, nrwords, arr, i, n) {
   min = var["config"]["mimicminwords"] ? int(var["config"]["mimicminwords"]) : 10
   max = var["config"]["mimicmaxwords"] ? int(var["config"]["mimicmaxwords"]) : 15
   sentence = ""
-  key = randkey(mimic)
+  key = randkey(var["mimic"])
 
   ## Find an amount of words to concatenate based on the next/previous one
   nrwords = int(rand() * (max - min)) + min
   dbg(5, "mimic", sprintf("min: %s, max: %s, key: %s, nrwords: %s", min, max, key, nrwords))
 
   while (nrwords-- > 0) {
-    if (!mimic[key]) key = randkey(mimic)
-    split(mimic[key], arr, ",")
-    word = arr[randkey(arr)]
+    for (i=1; i<=10; i++) {
+      if (!var["mimic"][key]) key = randkey(var["mimic"])
+      else continue
+    }
+    n = split(var["mimic"][key], arr, ",")
+    i = randkey(arr)
+    word = arr[i]
     sentence = sentence ? sentence" "word : word
     key = word
+    dbg(6, "mimic", sprintf("key: \"%s\", arr=\"%s\", n=%d, i=\"%s\"",key, var["mimic"][key], n, i))
     dbg(6, "mimic", sprintf("word: \"%s\" sentence: \"%s\"", word, sentence))
   }
 
@@ -34,7 +39,7 @@ function _mimic(    min, max, sentence, key, word, nrwords, arr) {
 
 
 ## Split a line into words and add then to a mimic dictionary (uses: config[])
-function mimicAddLine(dict, line,   i, n, min, max, word, words, key) {
+function mimicAddLine(line,   i, n, l, min, max, word, words, key) {
   dbg(5, "mimicAddLine", sprintf("line: %s", line))
   min = var["config"]["mimicminlen"] ? int(var["config"]["mimicminlen"]) : 2
   max = var["config"]["mimicmaxlen"] ? int(var["config"]["mimicmaxlen"]) : 20
@@ -52,8 +57,8 @@ function mimicAddLine(dict, line,   i, n, min, max, word, words, key) {
 
     ## Add word to dictionary
     if ( (length(word) >= min) && (length(word) <= max) ) {
-      dict[key] = (dict[key]) ? word","dict[key] : word
-      dbg(6, "mimicAddLine", sprintf(" dict[%s] += %s (%s)", key, word, dict[key]))
+      var["mimic"][key] = (var["mimic"][key]) ? word","var["mimic"][key] : word
+      dbg(6, "mimicAddLine", sprintf(" var[mimic][%s] += %s (%s)", key, word, var["mimic"][key]))
       key = word
     }
   }

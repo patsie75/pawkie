@@ -12,7 +12,6 @@ BEGIN {
 }
 
 ## do Bert
-#function _bert(msg,   rnd1, rnd2) {
 {
   ## load data if neccesary
   if (!bert["1,0"])

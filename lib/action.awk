@@ -103,7 +103,7 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
           switch(plugin) {
             # "raw" just send command to IRC server
             case "raw":
-              send(var["system"]["ircd"], vsub(command))
+              send(vsub(command))
               return
             break
 
@@ -116,9 +116,9 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
                   # catch single line return from function and send PRIVMSG to IRC server
                   out = @call(var["irc"]["args"])
                   if (out ~ /^ACTION/)
-                    send(var["system"]["ircd"], sprintf("PRIVMSG $T :\001%s\001", out))
+                    send(sprintf("PRIVMSG $T :\001%s\001", out))
                   else
-                    send(var["system"]["ircd"], sprintf("PRIVMSG $T :%s", out))
+                    send(sprintf("PRIVMSG $T :%s", out))
                 } else dbg(2, "action", sprintf("Configured command \"%s\" doesn't have a function %s()", var["irc"]["cmd"], call))
               } else dbg(4, "action", sprintf("No such internal function \"%s\"", var["irc"]["cmd"]))
               return
@@ -131,9 +131,9 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
               # send output as PRIVMSG to IRC server
               for (i=1; i<=n; i++)
                 if (output[i] ~ /^ACTION/)
-                  send(var["system"]["ircd"], vsub(sprintf("PRIVMSG $T :\001%s\001", output[i])))
+                  send(vsub(sprintf("PRIVMSG $T :\001%s\001", output[i])))
                 else
-                  send(var["system"]["ircd"], vsub(sprintf("PRIVMSG $T :%s", output[i])))
+                  send(vsub(sprintf("PRIVMSG $T :%s", output[i])))
               return
             break
 

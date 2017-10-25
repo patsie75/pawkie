@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SELF=$(basename "$0")
-CFG="config.cfg"
+CFG="${SELF/.sh/.ini}"
 LOG="${SELF/.sh/.log}"
 LIBS=$(for i in lib/*.awk commands/*.awk; do echo -n "-f $i "; done)
 #PROFILE=1
