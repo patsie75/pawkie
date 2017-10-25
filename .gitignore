@@ -1,5 +1,7 @@
 *.swp
 *.log
 awkprof.out
+index.php
 test
 test/*
+data/mimic.dat
