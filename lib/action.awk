@@ -14,6 +14,7 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
 
   # loop over all actions
   for (act=1; act<=var["system"]["actions"]; act++) {
+    dbg(6, "action", sprintf("%2d: %s", act, reaction(var["actions"][act])))
     from = 0
     to = 0
     saying = 0
@@ -24,9 +25,9 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
 
       # ON <action>
       if (tolower(token[1]) == tolower(var["irc"]["action"])) {
-        dbg(6, "action", sprintf("Found ON %s", toupper(token[1])))
+        dbg(6, "action", sprintf("%2d: Found ON %s", act, toupper(token[1])))
 
-        # FROM "%"<group>|<nick>["!"<auth>["@"<host>]] (todo: nick!auth@host)
+        # FROM "%"<group>|<nick>["!"<auth>["@"<host>]]
         if (token[2]) {
           # split multiple persons/groups "FROM %group1|%group2"
           n = split(tolower(token[2]), tmp, "|")
@@ -36,10 +37,17 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
               # check if activating user is part of the group
               if (isPartOf(var["irc"]["user"], substr(tmp[i], 2))) {
                 from = 1
-                dbg(6, "action", sprintf(" FROM (%s in %s)", var["irc"]["user"], tmp[i]))
+                dbg(6, "action", sprintf("%2d: FROM (%s in %s)", act, var["irc"]["user"], tmp[i]))
                 break
               }
-            } else dbg(3, "action", sprintf("FROM %s not a group", tmp[i]))
+            } else {
+              # check if activating user matches a mask
+              if (tolower(var["irc"]["user"]) ~ tmp[i]) {
+                from = 1
+                dbg(6, "action", sprintf("%2d: FROM (%s ~ %s)", act, var["irc"]["user"], tmp[i]))
+                break
+              }
+            }
           }
         } else from = 1
 
@@ -52,7 +60,7 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
             # check if activating target is part of the list
             if (tolower(var["irc"]["target"]) == tmp[i]) {
               to = 1
-              dbg(6, "action", sprintf(" TO (%s)", var["irc"]["target"]))
+              dbg(6, "action", sprintf("%2d: TO (%s)", act, var["irc"]["target"]))
               break
             }
           }
@@ -64,7 +72,7 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
           # check if spoken text regexp matches <content> (case insensitive)
           if (tolower(var["irc"]["msg"]) ~ tolower(token[4])) {
             saying = 1
-            dbg(6, "action", sprintf(" SAYING (%s)", var["irc"]["msg"]))
+            dbg(6, "action", sprintf("%2d: SAYING (%s)", act, var["irc"]["msg"]))
           }
         } else saying = 1
 
@@ -76,7 +84,7 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
 
           # check if CHANCE is bigger (or equal) than rnd
           if (token[5] >= rnd) chance = 1
-          dbg(6, "action", sprintf(" CHANCE %d %s %d", token[5], (token[5]>=rnd)?">=":"<", rnd))
+          dbg(6, "action", sprintf("%2d: CHANCE %d %s %d", act, token[5], (token[5]>=rnd)?">=":"<", rnd))
         } else chance = 1
 
 
@@ -113,12 +121,7 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
                 # called function is prepended with "_"
                 call = "_"var["irc"]["cmd"]
                 if (call in FUNCTAB) {
-                  # catch single line return from function and send PRIVMSG to IRC server
-                  out = @call(var["irc"]["args"])
-                  if (out ~ /^ACTION/)
-                    send(sprintf("PRIVMSG $T :\001%s\001", out))
-                  else
-                    send(sprintf("PRIVMSG $T :%s", out))
+                  msg(@call(var["irc"]["args"]))
                 } else dbg(2, "action", sprintf("Configured command \"%s\" doesn't have a function %s()", var["irc"]["cmd"], call))
               } else dbg(4, "action", sprintf("No such internal function \"%s\"", var["irc"]["cmd"]))
               return
@@ -130,10 +133,7 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
               n = dyncommand("awk", var["irc"]["cmd"]".awk", var["irc"]["args"], output)
               # send output as PRIVMSG to IRC server
               for (i=1; i<=n; i++)
-                if (output[i] ~ /^ACTION/)
-                  send(vsub(sprintf("PRIVMSG $T :\001%s\001", output[i])))
-                else
-                  send(vsub(sprintf("PRIVMSG $T :%s", output[i])))
+                msg(output[i])
               return
             break
 

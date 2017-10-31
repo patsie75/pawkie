@@ -3,6 +3,8 @@ BEGIN {
   var["permissions"]["load"] = "admin|oper"
   var["timers"]["load"] = 5
 
+  var["aliases"]["reload"] = "load"
+
   var["help"]["load"] = "(re)loads configuration files"
   var["usage"]["load"] = "[config|plugins|groups|commands|permissions|timers|actions|all]"
 }

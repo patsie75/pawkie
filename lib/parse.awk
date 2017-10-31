@@ -22,12 +22,12 @@ function parse(raw,   i, usr, varargs) {
     case "PRIVMSG":
     case "TOPIC":
     case "MODE":
+    case "PART":
       var["irc"]["target"] = (raw[3] ~ /^(#|&)/) ? raw[3] : var["irc"]["nick"]
       var["irc"]["msg"] = raw[4] ? raw[4] : ""
     break
 
     case "JOIN":
-    case "PART":
     case "NICK":
       var["irc"]["target"] = (raw[4] ~ /^(#|&)/) ? raw[4] : var["irc"]["nick"]
       var["irc"]["msg"] = ""

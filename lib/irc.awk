@@ -5,6 +5,17 @@ function send(str) {
   print str |& var["system"]["ircd"]
 }
 
+## send message to target
+function msg(str) {
+  if (str) {
+    if (str ~ /^ACTION/) {
+      send("PRIVMSG "var["irc"]["target"]" :\001"str"\001")
+    } else {
+      send("PRIVMSG "var["irc"]["target"]" :"str)
+    }
+  }
+}
+
 ## receive string from server
 function recv(   i, try) {
   try = 1

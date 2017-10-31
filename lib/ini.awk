@@ -63,6 +63,7 @@ function saveIni(fname,    ext, n, file, start, idx) {
 
   switch(ext) {
     case "cfg":
+    case "ini":
       file = var["config"]["configdir"] ? var["config"]["configdir"]"/"fname : "./"fname
     break
     case "dat":
@@ -80,9 +81,8 @@ function saveIni(fname,    ext, n, file, start, idx) {
 
   for (idx in var[label]) {
     if ( (idx != "") && (var[label][idx] != "") ) {
-      if (var[label][idx] ~ /^[0-9]+$/) printf("%s = %s\n", idx, var[label][idx]) >>file
-      else printf("%s = \"%s\"\n", idx, var[label][idx]) >>file
-
+      if (var[label][idx] ~ /^[0-9]+$/) printf("%-20s = %s\n", idx, var[label][idx]) >>file
+      else printf("%-20s = \"%s\"\n", idx, var[label][idx]) >>file
       n++
       dbg(5, "saveIni", sprintf("#%02d: %s: %s = \"%s\"", n, label, idx, var[label][idx]))
     }

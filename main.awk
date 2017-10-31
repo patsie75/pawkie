@@ -68,14 +68,14 @@ BEGIN {
     # :user@auth@host ACTION [target] [:]message
     # :Patsie!patsie@patsie.nl NICK :Petsie
 
-    if (match($0, /^:([^ ]+) ([0-9A-Z]+) ([^ ]+)? ?:?(.*)$/, raw)) {
+    if (match($0, /^:([^ ]+) ([0-9A-Z]+) ([^ :]+)? ?:?(.*)$/, raw)) {
       # parse input data
       var["irc"]["raw"] = $0
       parse(raw)
   
 #      dbg(4, "main", sprintf("raw: \"%s\"", var["irc"]["raw"]))
 #      dbg(5, "main", sprintf("user: %s [%s!%s@%s]", var["irc"]["user"], var["irc"]["nick"], var["irc"]["auth"], var["irc"]["host"]))
-#      dbg(5, "main", sprintf("target: %s", var["irc"]["target"]))
+#      dbg(5, "main", sprintf("target: %s (channel: %s)", var["irc"]["target"], var["irc"]["channel"]))
 #      dbg(5, "main", sprintf("action: %s", var["irc"]["action"]))
 #      dbg(5, "main", sprintf("message: %s [%s (%s)]", var["irc"]["msg"], var["irc"]["cmd"], var["irc"]["args"]))
 #      s = "words:"
@@ -93,10 +93,7 @@ BEGIN {
         # handle oneliners
         out = _onelinerAction(var["irc"]["cmd"])
         if (out) {
-          if (out ~ /^ACTION/)
-            send(vsub(sprintf("PRIVMSG $T :\001%s\001", out)))
-          else
-            send(vsub(sprintf("PRIVMSG $T :%s", out)))
+          msg(vsub(out))
           continue
         }
       }

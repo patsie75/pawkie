@@ -29,13 +29,7 @@ function command(   cmd, perm, time, call, n, i, output) {
             call = "_"cmd
             if (call in FUNCTAB) {
               dbg(4, "command", sprintf("Executing internal command %s(\"%s\")", call, var["irc"]["args"]))
-              out = @call(var["irc"]["args"])
-              if (out) {
-                if (out ~ /^ACTION/)
-                  send(sprintf("PRIVMSG %s :\001%s\001", var["irc"]["target"], out))
-                else
-                  send(sprintf("PRIVMSG %s :%s", var["irc"]["target"], out))
-              }
+              msg(@call(var["irc"]["args"]))
               return(1)
             } else dbg(2, "command", sprintf("defined command \"%s\" does not have a function \"%s\"", cmd, call))
           break
@@ -44,10 +38,7 @@ function command(   cmd, perm, time, call, n, i, output) {
             dbg(4, "command", sprintf("Executing external command %s(\"%s\")", cmd, var["irc"]["args"]))
             n = dyncommand(var["commands"][cmd], cmd"."var["commands"][cmd], var["irc"]["args"], output)
             for (i=1; i<=n; i++)
-              if (output[i] ~ /^ACTION/)
-                send(sprintf("PRIVMSG %s :\001%s\001", var["irc"]["target"], output[i]))
-              else
-                send(sprintf("PRIVMSG %s :%s", var["irc"]["target"], output[i]))
+              msg(output[i])
             return(1)
           break
 

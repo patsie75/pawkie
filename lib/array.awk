@@ -6,7 +6,7 @@ function loadArray(label) {
 function mergeArray(fname,   ext, n, file, start, keyval) {
   file = ""
   label = substr(fname, 1, rindex(fname, ".")-1)
-  ext = substr(fname, rindex(fname, ".")+1)
+  ext = substr(fname, rindex(fname, "."))
 
   switch(ext) {
     case "cfg":

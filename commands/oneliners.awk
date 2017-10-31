@@ -65,5 +65,6 @@ function _onelinerAction(cmd,   arr, i) {
       return(data[cmd,rnd])
     }
   }
+  dbg(5, "onelinerAction", sprintf("cmd: \"%s\" not found", cmd))
 }
 
