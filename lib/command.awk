@@ -7,14 +7,14 @@ function command(   cmd, perm, time, call, n, i, output) {
   
       perm = 0
       # is the user allowed to run this command
-      if (var["permissions"][cmd]) {
+      if (cmd in var["permissions"]) {
         if (isPartOf(var["irc"]["user"], var["permissions"][cmd])) perm = 1
         else dbg(4, "command", sprintf("var["permissions"][%s] user \"%s\" not in \"%s\"", cmd, var["irc"]["user"], var["permissions"][cmd]))
       } else perm = 1
   
       time = 0
       # commands have minimum interval between runs
-      if (var["timers"][cmd]) {
+      if (cmd in var["timers"]) {
         trgt = tolower(cmd","var["irc"]["target"])
         if (systime() >= var["timer"][trgt]) {
           var["timer"][trgt] = systime() + var["timers"][cmd]
