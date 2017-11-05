@@ -7,6 +7,8 @@
       gsub(/^ *"?|"? *$/, "", keyval[1])
       gsub(/^ *"?|"? *$/, "", keyval[2])
       config[tolower(keyval[1])] = keyval[2]
+
+      #printf("config[\"%s\"] = \"%s\"\n", tolower(keyval[1]), keyval[2])
     }
   }
 }

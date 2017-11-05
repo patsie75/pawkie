@@ -1,12 +1,12 @@
-function dynLoadArray(label, array,   n, file, keyval) {
+function dynLoadArray(label, array,   n, file, line, keyval) {
   n = 0
   file = config["datadir"] ? config["datadir"]"/"label : "./"label
 
   delete array
 
-  while ((getline < file) > 0) {
+  while ((getline line < file) > 0) {
     ## skip comments and split key=value pairs
-    if ( ($0 !~ /^ *(#|;)/) && (match($0, /([^=]+)=(.+)/, keyval) > 0) ) {
+    if ( (line !~ /^ *(#|;)/) && (match(line, /([^=]+)=(.+)/, keyval) > 0) ) {
       ## strip leading/trailing spaces and doublequotes
       gsub(/^ *"?|"? *$/, "", keyval[1])
       gsub(/^ *"?|"? *$/, "", keyval[2])

@@ -16,7 +16,9 @@ function _help(str,    cmd, result) {
     cmd = substr(str, 7)
     dbg(6, "help", "usage: cmd = \""cmd"\"")
     if (cmd in var["usage"]) {
+      dbg(6, "help", "usage: "cmd" in usage")
       if (cmd in var["permissions"]) {
+        dbg(6, "help", "usage: "cmd" in permissions")
         if (isPartOf(var["irc"]["user"], var["permissions"][cmd])) {
           return(var["usage"][cmd])
         } else return("This is not a command for you")

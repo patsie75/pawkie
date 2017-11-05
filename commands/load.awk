@@ -6,46 +6,24 @@ BEGIN {
   var["aliases"]["reload"] = "load"
 
   var["help"]["load"] = "(re)loads configuration files"
-  var["usage"]["load"] = "[config|plugins|groups|commands|permissions|timers|actions|all]"
+  var["usage"]["load"] = "reload"
 }
 
 function _load(args) {
   dbg(5, "load", sprintf("args: \"%s\"", args))
   argc = split(args, argv, " ")
 
-  if (argc >= 1) {
-    switch(argv[1]) {
-      case "config":
-      case "plugins":
-      case "groups":
-      case "commands":
-      case "permissions":
-      case "timers":
-        loadArray(argv[1]".cfg")
-        return("Reloaded "argv[1])
-      break
+  ## load different configs
+  loadIni(cfg?cfg:"config.ini")
 
-      case "actions":
-        sysvar["actions"] = tokenize("actions.cfg")
-        return("Reloaded "argv[1])
-      break
-  
-      case "all":
-        ## load different configs
-        loadArray("config.cfg")
-        loadArray("plugins.cfg")
-        loadArray("groups.cfg")
-        loadArray("commands.cfg")
-        loadArray("permissions.cfg")
-        loadArray("timers.cfg")
-  
-        ## read "actions" file
-        var["system"]["actions"] = tokenize("actions.cfg")
-        return("Reloaded everything")
-      break
-  
-      default:
-        return("Unknown option \""argv[1]"\"")
-    }
-  } else dbg(4, "load", "Not enough arguments")
+  ## read "actions" file
+  var["system"]["actions"] = tokenize("actions.cfg")
+
+  # create empty mimic array
+  loadArray("mimic.dat")
+  var["mimic"]["__placeholder__"] = ""
+  delete var["mimic"]["__placeholder__"]
+
+  dbg(4, "load", "Reload complete")
+  return("Reload complete")
 }

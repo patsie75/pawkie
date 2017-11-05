@@ -1,13 +1,14 @@
 #!/usr/bin/gawk -f
 @include "dyn/dynconfig.awk"
 @include "dyn/dynarray.awk"
+@include "dyn/i18n.awk"
 
 BEGIN {
-#  commands["bert"] = "awk"
-#  permissions["bert"] = "oper|admin|friend"
-#  timers["bert"] = 600
-#  help["bert"] = "Bert helps you out of a tight situation with words of wisdom"
-#  usage["bert"] = "<form of action>"
+  l10n["bert,datfile"]["en"] = "bert_en.dat"
+  l10n["bert,datfile"]["nl"] = "bert_nl.dat"
+  l10n["bert,response1"]["en"] = "Isn't $m quite difficult, Bert?\n"
+  l10n["bert,response1"]["nl"] = "Is $m niet heel moeilijk dan, Bert?\n"
+  
   srand()
 }
 
@@ -15,7 +16,7 @@ BEGIN {
 {
   ## load data if neccesary
   if (!bert["1,0"])
-    dynLoadArray("bert.dat", bert);
+    dynLoadArray(i18n("bert,datfile"), bert);
 
   ## pick 2 random choices
   rnd1 = int(rand() * bert["1,0"] + 1);
@@ -23,6 +24,6 @@ BEGIN {
 
   ## send output
   printf("%s?\n", bert["1,"rnd1])
-  printf("Is $m niet heel moeilijk dan, Bert?\n")
+  printf(i18n("bert,response1"))
   printf("%s!\n", bert["2,"rnd2])
 }

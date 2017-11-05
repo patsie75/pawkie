@@ -7,9 +7,9 @@ BEGIN {
   var["aliases"]["del"] = "var del"
 
   var["help"]["var"] = "shows or modifies system variables"
-  var["usage"]["var"][2] = "get <key1>[\".\"<key2>[\".\"<etc>]] (show value of key)"
-  var["usage"]["var"][3] = "set <key1>[\".\"<key2>[\".\"<etc>]] <value> (modify key to value)"
-  var["usage"]["var"][4] = "del <key1>[\".\"<key2>[\".\"<etc>]] (deletes key)"
+  var["usage"]["get"] = "get <key1>[\"" var["IS"]?var["IS"]:"." "\"<key2>[\"" var["IS"]?var["IS"]:"." "\"<etc>]] (show value of key)"
+  var["usage"]["set"] = "set <key1>[\"" var["IS"]?var["IS"]:"." "\"<key2>[\"" var["IS"]?var["IS"]:"." "\"<etc>]] <value> (modify key to value)"
+  var["usage"]["del"] = "del <key1>[\"" var["IS"]?var["IS"]:"." "\"<key2>[\"" var["IS"]?var["IS"]:"." "\"<etc>]] (deletes key)"
 }
 
 
@@ -27,8 +27,8 @@ function listArray(arr,   result, key) {
 function getValue(arr, keys,   k1, k2) {
   # k1 is first key, k2 is rest (key1.key2.key3.etc)
   # k1 is empty and k2 set with only 1 key (key1)
-  k1 = substr(keys, 1, index(keys, ".")-1)
-  k2 = substr(keys, index(keys, ".")+1)
+  k1 = substr(keys, 1, index(keys, var["IS"]?var["IS"]:".")-1)
+  k2 = substr(keys, index(keys, var["IS"]?var["IS"]:".")+1)
 
   if (k1) {
     # itterate over all keys
@@ -52,8 +52,8 @@ function getValue(arr, keys,   k1, k2) {
 function setValue(arr, keys, value,   k1, k2, v) {
   # k1 is first key, k2 is rest (key1.key2.key3.etc)
   # k1 is empty and k2 set with only 1 key (key1)
-  k1 = substr(keys, 1, index(keys, ".")-1)
-  k2 = substr(keys, index(keys, ".")+1)
+  k1 = substr(keys, 1, index(keys, var["IS"]?var["IS"]:".")-1)
+  k2 = substr(keys, index(keys, var["IS"]?var["IS"]:".")+1)
 
   if (k1) {
     # itterate over all keys
@@ -82,8 +82,8 @@ function setValue(arr, keys, value,   k1, k2, v) {
 function delValue(arr, keys,   k1, k2) {
   # k1 is first key, k2 is rest (key1.key2.key3.etc)
   # k1 is empty and k2 set with only 1 key (key1)
-  k1 = substr(keys, 1, index(keys, ".")-1)
-  k2 = substr(keys, index(keys, ".")+1)
+  k1 = substr(keys, 1, index(keys, var["IS"]?var["IS"]:".")-1)
+  k2 = substr(keys, index(keys, var["IS"]?var["IS"]:".")+1)
 
   if (k1) {
     # itterate over all keys
@@ -104,15 +104,23 @@ function _var(args,    argc, argv) {
   dbg(5, "var", sprintf("args: \"%s\"", args))
   argc = split(args, argv, " ")
 
-  if (argc >= 2) {
-    switch(argv[1]) {
-      case "get": return(sprintf("%s = %s", argv[2], getValue(var, argv[2])))
-      case "set": return(sprintf("%s = %s", argv[2], setValue(var, argv[2], argv[3])))
-      case "del": 
+  switch(argv[1]) {
+    case "get":
+      if (argc >= 2) return(sprintf("%s = %s", argv[2], getValue(var, argv[2])))
+      else return(listArray(var))
+
+    case "set":
+      if (argc >= 3) return(sprintf("%s = %s", argv[2], setValue(var, argv[2], argv[3])))
+      else return("Too few arguments (#"argc" < 3)")
+
+    case "del": 
+      if (argc >= 2) 
         if ((argv[2] != "config") && (argv[2] != "system"))
           return(sprintf("%s = %s", argv[2], delValue(var, argv[2])))
         else return("Sorry, I will not selfdestruct")
-      default: return("Unknown option: "argv[1])
-    }
-  } else dbg(2, "var", sprintf("Too few arguments (#%d < 2)", argc))
+      else return("Too few arguments (#"argc" < 2)")
+
+    default:
+      return("Unknown option: "argv[1])
+  }
 }

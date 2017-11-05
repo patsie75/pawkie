@@ -2,7 +2,7 @@
 ## Usage: dbg(4, "callingFunction", "message")
 function dbg(level, fnc, msg,   fncs) {
   # only debug functions configured in config["debugfnc"]
-  if (var["config"]["debugfnc"]) {
+  if ("debugfnc" in var["config"]) {
     # ! negates the debugfnc list
     if ( substr(var["config"]["debugfnc"], 1, 1) == "!" ) {
       negate = 1

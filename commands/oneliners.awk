@@ -52,19 +52,32 @@ function _oneliners(str,    reply, cmd, args, arr, i) {
 }
 
 
-function _onelinerAction(cmd,   arr, i) {
+function _onelinerAction(cmd,   arr, i, time, trgt) {
   dbg(5, "onelinerAction", sprintf("cmd: \"%s\"", cmd))
   split(var["config"]["oneliners"], arr, " ")
 
-  for (i in arr) {
-    if (cmd == arr[i]) {
-      dbg(5, "onelinerAction", sprintf("found match for cmd: \"%s\"", cmd))
-      if (!data[cmd,0]) loadText(cmd)
-      rnd = int(rand() * data[cmd,0]) + 1
-      dbg(5, "onelinerAction", sprintf("responding: \"%s\"", data[cmd,rnd]))
-      return(data[cmd,rnd])
+  time = 0
+  # commands have minimum interval between runs
+  if ("onelineraction" in var["timers"]) {
+    trgt = tolower("onelineraction,"var["irc"]["target"])
+    if (systime() >= var["timer"][trgt]) {
+      var["timer"][trgt] = systime() + var["timers"]["onelineraction"]
+      time = 1
     }
+  } else time = 1
+
+  if (time) {
+    for (i in arr) {
+      if (cmd == arr[i]) {
+        dbg(5, "onelinerAction", sprintf("found match for cmd: \"%s\"", cmd))
+        if (!data[cmd,0]) loadText(cmd)
+        rnd = int(rand() * data[cmd,0]) + 1
+        dbg(5, "onelinerAction", sprintf("responding: \"%s\"", data[cmd,rnd]))
+        return(data[cmd,rnd])
+      }
+    }
+    dbg(5, "onelinerAction", sprintf("cmd: \"%s\" not found", cmd))
   }
-  dbg(5, "onelinerAction", sprintf("cmd: \"%s\" not found", cmd))
+  dbg(4, "onelineraction", sprintf("timer[%s] %s has not yet passed %s", trgt, strftime("%T"), strftime("%T", var["timer"][trgt])))
 }
 

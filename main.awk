@@ -11,6 +11,10 @@ BEGIN {
   debug[1] = "ERROR"
   debug[0] = "CRIT"
 
+  # Index Separator
+  var["IS"] = "."
+  var["config"]["locale"] = ENVIRON["LANG"]
+
   var["config"]["debuglvl"] = 6
   #var["config"]["debugfnc"] = "loadConfig,tokenize"
 
@@ -46,7 +50,7 @@ BEGIN {
   }
 
   ## join channels
-  if (var["config"]["channels"]) {
+  if ("channels" in var["config"]) {
     system("sleep 3")
     split(var["config"]["channels"], chan, ",")
     for (c in chan)
