@@ -32,6 +32,12 @@ BEGIN {
   ## define IRC server connection
   var["system"]["ircd"] = "/inet/tcp/0/" var["config"]["host"] "/" var["config"]["port"]
 
+  # send password if configured
+  if ("password" in var["config"]) {
+    system("sleep 2")
+    send("PASS " var["config"]["password"])
+  }
+
   ## wait for connection to be established
   var["system"]["startup"] = systime()
   if (recv() <= 0) {
@@ -57,6 +63,10 @@ BEGIN {
       send("JOIN " strip(chan[c]))
   }
 
+  ## if gracetime is defined, set a grace period
+  if ("gracetime" in var["config"])
+    var["system"]["gracetime"] = systime() + var["config"]["gracetime"]
+
   ## main loop
   while (recv() > 0) {
     var["system"]["then"] = var["system"]["now"]
@@ -69,22 +79,25 @@ BEGIN {
       continue
     }
 
-    # :user@auth@host ACTION [target] [:]message
-    # :Patsie!patsie@patsie.nl NICK :Petsie
+    ## ignore anything within grace period
+    if (var["system"]["now"] <= var["system"]["gracetime"]) {
+      dbg(3, "main", sprintf("gracetime ignore (%s < %s)", strftime("%T", var["system"]["now"]), strftime("%T", var["system"]["gracetime"])))
+      continue
+    }
 
     if (match($0, /^:([^ ]+) ([0-9A-Z]+) ([^ :]+)? ?:?(.*)$/, raw)) {
       # parse input data
       var["irc"]["raw"] = $0
       parse(raw)
   
-#      dbg(4, "main", sprintf("raw: \"%s\"", var["irc"]["raw"]))
-#      dbg(5, "main", sprintf("user: %s [%s!%s@%s]", var["irc"]["user"], var["irc"]["nick"], var["irc"]["auth"], var["irc"]["host"]))
-#      dbg(5, "main", sprintf("target: %s (channel: %s)", var["irc"]["target"], var["irc"]["channel"]))
-#      dbg(5, "main", sprintf("action: %s", var["irc"]["action"]))
-#      dbg(5, "main", sprintf("message: %s [%s (%s)]", var["irc"]["msg"], var["irc"]["cmd"], var["irc"]["args"]))
+#      dbg(5, "main", sprintf("raw: \"%s\"", var["irc"]["raw"]))
+#      dbg(6, "main", sprintf("user: %s [%s!%s@%s]", var["irc"]["user"], var["irc"]["nick"], var["irc"]["auth"], var["irc"]["host"]))
+#      dbg(6, "main", sprintf("target: %s (channel: %s)", var["irc"]["target"], var["irc"]["channel"]))
+#      dbg(6, "main", sprintf("action: %s", var["irc"]["action"]))
+#      dbg(6, "main", sprintf("message: %s [%s (%s)]", var["irc"]["msg"], var["irc"]["cmd"], var["irc"]["args"]))
 #      s = "words:"
 #      for (w in var["irc"]["argv"]) s = s" "w":\""var["irc"]["argv"][w]"\""
-#      dbg(5, "main", sprintf("%s", s))
+#      dbg(6, "main", sprintf("%s", s))
 
       # process aliasses first
       alias()

@@ -6,8 +6,8 @@ BEGIN {
   var["help"]["oneliners"] = "oneliners help"
   var["usage"]["oneliners"] = "oneliners [add|del] <oneliner>"
 
-  var["commands"]["onelinerAction"] = "cmd"
-  var["permissions"]["onelinerAction"] = "bot"
+  var["commands"]["onelineraction"] = "cmd"
+  #var["permissions"]["onelineraction"] = "bot"
 }
 
 

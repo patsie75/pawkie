@@ -4,7 +4,7 @@ BEGIN {
   var["timers"]["say"] = 5
 
   var["help"]["say"] = "Say a message to either a person or channel"
-  var["usage"]["say"] = "say <target> <msg>"
+  var["usage"]["say"] = "<target> <msg>"
 }
 
 function _say(str,   target, msg) {

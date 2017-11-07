@@ -31,7 +31,7 @@ function command(   cmd, perm, time, call, n, i, output) {
               dbg(4, "command", sprintf("Executing internal command %s(\"%s\")", call, var["irc"]["args"]))
               msg(@call(var["irc"]["args"]))
               return(1)
-            } else dbg(2, "command", sprintf("defined command \"%s\" does not have a function \"%s\"", cmd, call))
+            } else dbg(2, "command", sprintf("defined command \"%s\" does not have a function %s()", cmd, call))
           break
 
           case "awk":

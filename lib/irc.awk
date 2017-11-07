@@ -22,7 +22,7 @@ function recv(   i, try) {
 
   if ( (i=(var["system"]["ircd"] |& getline)) > 0 ) {
 
-#  while ( (i=(var["system"]["ircd"] |& getline)) < 1 && (try <= config["readfails"]?config["readfails"]:4) ) {
+#  while ( (i=(var["system"]["ircd"] |& getline)) < 1 && (try <= var["config"]["readfails"]?var["config"]["readfails"]:4) ) {
 #    dbg(2, "recv", sprintf("read failure #%d from %s", try, var["system"]["ircd"]))
 #    system("sleep " try)
 #    try++
