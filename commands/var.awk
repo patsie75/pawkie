@@ -7,9 +7,9 @@ BEGIN {
   var["aliases"]["del"] = "var del"
 
   var["help"]["var"] = "shows or modifies system variables"
-  var["usage"]["get"] = "get <key1>[\"" var["IS"]?var["IS"]:"." "\"<key2>[\"" var["IS"]?var["IS"]:"." "\"<etc>]] (show value of key)"
-  var["usage"]["set"] = "set <key1>[\"" var["IS"]?var["IS"]:"." "\"<key2>[\"" var["IS"]?var["IS"]:"." "\"<etc>]] <value> (modify key to value)"
-  var["usage"]["del"] = "del <key1>[\"" var["IS"]?var["IS"]:"." "\"<key2>[\"" var["IS"]?var["IS"]:"." "\"<etc>]] (deletes key)"
+  var["usage"]["get"] = "<key1>[\"" var["IS"]?var["IS"]:"." "\"<key2>[\"" var["IS"]?var["IS"]:"." "\"<etc>]] (show value of key)"
+  var["usage"]["set"] = "<key1>[\"" var["IS"]?var["IS"]:"." "\"<key2>[\"" var["IS"]?var["IS"]:"." "\"<etc>]] <value> (modify key to value)"
+  var["usage"]["del"] = "<key1>[\"" var["IS"]?var["IS"]:"." "\"<key2>[\"" var["IS"]?var["IS"]:"." "\"<etc>]] (deletes key)"
 }
 
 

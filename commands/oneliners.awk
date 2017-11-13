@@ -4,10 +4,10 @@ BEGIN {
   var["timers"]["oneliners"] = 5
 
   var["help"]["oneliners"] = "oneliners help"
-  var["usage"]["oneliners"] = "oneliners [add|del] <oneliner>"
+  var["usage"]["oneliners"] = "[add|del] <oneliner>"
 
-  var["commands"]["onelineraction"] = "cmd"
-  #var["permissions"]["onelineraction"] = "bot"
+  #var["commands"]["onelinerAction"] = "cmd"
+  var["permissions"]["onelinerAction"] = "bot"
 }
 
 
@@ -52,32 +52,26 @@ function _oneliners(str,    reply, cmd, args, arr, i) {
 }
 
 
-function _onelinerAction(cmd,   arr, i, time, trgt) {
+function _onelinerAction(cmd,   arr, i, trgt) {
   dbg(5, "onelinerAction", sprintf("cmd: \"%s\"", cmd))
   split(var["config"]["oneliners"], arr, " ")
 
-  time = 0
-  # commands have minimum interval between runs
-  if ("onelineraction" in var["timers"]) {
-    trgt = tolower("onelineraction,"var["irc"]["target"])
-    if (systime() >= var["timer"][trgt]) {
-      var["timer"][trgt] = systime() + var["timers"]["onelineraction"]
-      time = 1
-    }
-  } else time = 1
-
-  if (time) {
+  trgt = tolower("onelineraction,"var["irc"]["target"])
+  if (var["system"]["now"] >= var["timer"][trgt]) {
     for (i in arr) {
       if (cmd == arr[i]) {
         dbg(5, "onelinerAction", sprintf("found match for cmd: \"%s\"", cmd))
-        if (!data[cmd,0]) loadText(cmd)
-        rnd = int(rand() * data[cmd,0]) + 1
-        dbg(5, "onelinerAction", sprintf("responding: \"%s\"", data[cmd,rnd]))
-        return(data[cmd,rnd])
+        if (!var["data"][cmd][0]) loadText(cmd)
+        rnd = int(rand() * var["data"][cmd][0]) + 1
+
+        if ("onelineraction" in var["timers"])
+          var["timer"][trgt] = var["system"]["now"] + var["timers"]["onelineraction"]
+
+        dbg(5, "onelinerAction", sprintf("responding: \"%s\"", var["data"][cmd][rnd]))
+        return(var["data"][cmd][rnd])
       }
     }
     dbg(5, "onelinerAction", sprintf("cmd: \"%s\" not found", cmd))
-  }
-  dbg(4, "onelineraction", sprintf("timer[%s] %s has not yet passed %s", trgt, strftime("%T"), strftime("%T", var["timer"][trgt])))
+  } else dbg(4, "onelineraction", sprintf("timer[%s] %s has not yet passed %s", trgt, strftime("%T"), strftime("%T", var["timer"][trgt])))
 }
 

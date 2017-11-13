@@ -14,6 +14,6 @@ function _op(str,    cnt, arr, mode) {
     cnt = split(str, arr, " ")
     mode = "+"
     for (i=1; i<=cnt; i++) mode = mode "o"
-    send(sprintf("mode %s %s %s", var["irc"]["target"], mode, str))
+    send(sprintf("MODE %s %s %s", var["irc"]["target"], mode, str))
   } else send(vsub("MODE $T +o $N"))
 }

@@ -6,7 +6,7 @@ BEGIN {
   var["aliases"]["reload"] = "load"
 
   var["help"]["load"] = "(re)loads configuration files"
-  var["usage"]["load"] = "reload"
+  var["usage"]["load"] = ""
 }
 
 function _load(args) {

@@ -10,6 +10,19 @@ function parse(raw,   i, usr, varargs) {
   for (i in raw)
     dbg(6, "parse", sprintf("raw[%s] = \"%s\"", i, raw[i]))
 
+  # store previous versions of variables
+  var["irc"]["prev"]["user"] = var["irc"]["user"]
+  var["irc"]["prev"]["nick"] = var["irc"]["nick"]
+  var["irc"]["prev"]["auth"] = var["irc"]["auth"]
+  var["irc"]["prev"]["host"] = var["irc"]["host"]
+  var["irc"]["prev"]["groups"] = var["irc"]["groups"]
+  var["irc"]["prev"]["action"] = var["irc"]["action"]
+  var["irc"]["prev"]["target"] = var["irc"]["target"]
+  var["irc"]["prev"]["channel"] = var["irc"]["channel"]
+  var["irc"]["prev"]["msg"] = var["irc"]["msg"]
+  var["irc"]["prev"]["cmd"] = var["irc"]["cmd"]
+  var["irc"]["prev"]["args"] = var["irc"]["args"]
+
   var["irc"]["user"] = raw[1] ? raw[1] : ""
   if (match(var["irc"]["user"], /:*(.+)!(.+)@(.+)/, usr)) {
     var["irc"]["nick"] = usr[1] ? usr[1] : ""
@@ -40,6 +53,13 @@ function parse(raw,   i, usr, varargs) {
 
   var["irc"]["channel"] = (var["irc"]["target"] ~ /^(#|&)/) ? var["irc"]["target"] : ""
 
+  delete var["irc"]["groups"]
+  for (g in var["groups"]) {
+    if (isPartOf(var["irc"]["user"], g)) {
+      var["irc"]["groups"] = var["irc"]["groups"]?var["irc"]["groups"]", "g:g
+    }
+  }
+
   # check if this is a command
   if (substr(var["irc"]["msg"], 1, 1) == var["config"]["cmdchar"]) {
     # do we have arguments?
@@ -56,5 +76,8 @@ function parse(raw,   i, usr, varargs) {
   delete var["irc"]["argv"]
   var["irc"]["argc"] = split(var["irc"]["args"], varargs, " ")
   for (i in varargs) var["irc"]["argv"][i] = varargs[i]
+
+  # set last seen timestamp for a user
+  var["seen"][tolower(var["irc"]["user"])] = var["system"]["now"]
 }
 

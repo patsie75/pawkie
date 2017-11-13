@@ -9,5 +9,5 @@ BEGIN {
 
 function _join(str) {
   if (str) send("JOIN " str)
-  else send(vsub("PRIVMSG $T :I need to be told a channel to join"))
+  else return("I need to be told a channel to join")
 }

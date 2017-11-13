@@ -11,5 +11,5 @@ BEGIN {
 
 function _leave(str) {
   if (str) send("PART " str)
-  else send(vsub("PRIVMSG $T :I need to be told a channel to leave"))
+  else return("I need to be told a channel to leave")
 }

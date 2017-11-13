@@ -1,10 +1,10 @@
 BEGIN {
   var["commands"]["mimic"] = "cmd"
   var["permissions"]["mimic"] = "admin|oper|friend"
-  var["timers"]["mimic"] = 10
+  var["timers"]["mimic"] = 300
 
   var["help"]["mimic"] = "Immitate the users on the channel"
-  var["usage"]["mimic"] = "mimic"
+  var["usage"]["mimic"] = ""
 }
 
 

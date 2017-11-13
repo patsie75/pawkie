@@ -6,10 +6,10 @@ function loadText(label,   n, file, t1) {
   t1 = preciseTime()
 
   while ( (getline <file) > 0 )
-    data[label,++n] = $0
+    var["data"][label][++n] = $0
   close(file)
 
   dbg(4, "loadText", sprintf("Loaded %d entries from %s.txt in %.2f seconds", n, label, preciseTime()-t1))
-  return(data[label,0]=n)
+  return(var["data"][label][0]=n)
 }
 

@@ -137,6 +137,14 @@ function action(   act, i, from, to, saying, chance, token, n, tmp, plugin, comm
               return
             break
 
+            case "rnd":
+              if (!var["data"][command][0]) loadText(command)
+              rnd = int(rand() * var["data"][command][0]) + 1
+              if (var["data"][command][rnd]) msg(vsub(var["data"][command][rnd]))
+              else msg("I'm at a loss for words...")
+              return
+            break
+
             default:
               dbg(1, "action", sprintf("Unknown plugin \"%s\" in action #%d", plugin, act))
           }

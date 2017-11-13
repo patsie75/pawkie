@@ -73,6 +73,7 @@ function isPartOf(userhost, grps,   i, u, usr, g, grp) {
 # $N = nick
 # $A = auth
 # $H = host
+# $G = group(s)
 # $C = channel
 # $T = target (either nick or channel)
 # $I = IRC action
@@ -80,12 +81,24 @@ function isPartOf(userhost, grps,   i, u, usr, g, grp) {
 # $c = bot command
 # $m = message (without command)
 # $1-$9 = first 9 words of (short) message
-function vsub(msg) {
+function vsub(msg,   arr, rnd, range, offset) {
   dbg(6, "vsub", sprintf("pre msg=\"%s\"", msg))
+
+  # $rnd() produces random number in range 0-99
+  # $rnd(10) produces random number in range 0-9
+  # $rnd(6)+1 produces random number in range 1-6
+  if (match(msg, /\$rnd\(([0-9]*)\)(\+([0-9]+))?/, arr)) {
+    if (arr[1]) range = arr[1]; else range = 100
+    if (arr[2]) offset = arr[2]; else offset = 0
+    rnd = int(rand() * range + offset)
+  }
+  gsub(/\$rnd\([0-9]*\)(\+[0-9]+)?/, rnd, msg)
+
   gsub(/\$U/, var["irc"]["user"], msg)
   gsub(/\$N/, var["irc"]["nick"], msg)
   gsub(/\$A/, var["irc"]["auth"], msg)
   gsub(/\$H/, var["irc"]["host"], msg)
+  gsub(/\$G/, var["irc"]["groups"], msg)
   gsub(/\$T/, var["irc"]["target"], msg)
   gsub(/\$I/, var["irc"]["action"], msg)
   gsub(/\$C/, var["irc"]["channel"], msg)

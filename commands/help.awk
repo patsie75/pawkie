@@ -6,7 +6,7 @@ BEGIN {
   var["aliases"]["man"] = "help usage"
 
   var["help"]["help"] = "Get help about certain commands"
-  var["usage"]["help"] = "help [<command>]"
+  var["usage"]["help"] = "[usage] [<command>]"
 }
 
 function _help(str,    cmd, result) {
@@ -20,7 +20,7 @@ function _help(str,    cmd, result) {
       if (cmd in var["permissions"]) {
         dbg(6, "help", "usage: "cmd" in permissions")
         if (isPartOf(var["irc"]["user"], var["permissions"][cmd])) {
-          return(var["usage"][cmd])
+          return(var["config"]["cmdchar"] cmd " " var["usage"][cmd])
         } else return("This is not a command for you")
       } else return(var["usage"][cmd])
     } else return("Can't find manual for "cmd)

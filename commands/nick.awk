@@ -9,5 +9,5 @@ BEGIN {
 
 function _nick(str) {
   if (str) send("NICK " str)
-  else send(vsub("PRIVMSG $T :What nick would you like me to take?"))
+  else return("What nick would you like me to take?")
 }

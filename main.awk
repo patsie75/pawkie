@@ -34,7 +34,6 @@ BEGIN {
 
   # send password if configured
   if ("password" in var["config"]) {
-    system("sleep 2")
     send("PASS " var["config"]["password"])
   }
 
@@ -46,8 +45,20 @@ BEGIN {
   }
 
   ## login
-  system("sleep 1"); send("NICK " var["config"]["nick"])
-  system("sleep 1"); send("USER " var["config"]["user"] " 8 * :" var["config"]["geco"])
+  if ("nick" in var["config"]) {
+    system("sleep 1")
+    send("NICK " var["config"]["nick"])
+  } else {
+    dbg(0, "main", "Missing config item 'nick'")
+    exit(-1)
+  }
+  if (("user" in var["config"]) && ("geco" in var["config"])) {
+    system("sleep 1")
+    send("USER " var["config"]["user"] " 8 * :" var["config"]["geco"])
+  } else {
+    dbg(0, "main", "Missing config item 'user' and/or 'geco'")
+    exit(-1)
+  }
 
   ## wait for login process to complete
   if (recv() <= 0) {
@@ -64,8 +75,9 @@ BEGIN {
   }
 
   ## if gracetime is defined, set a grace period
-  if ("gracetime" in var["config"])
+  if ("gracetime" in var["config"]) {
     var["system"]["gracetime"] = systime() + var["config"]["gracetime"]
+  }
 
   ## main loop
   while (recv() > 0) {
@@ -103,7 +115,8 @@ BEGIN {
       alias()
 
       # handle commands
-      if (var["irc"]["cmd"] && var["irc"]["channel"]) {
+      #if (var["irc"]["cmd"] && var["irc"]["channel"]) {
+      if (var["irc"]["cmd"] && var["irc"]["target"]) {
         # handle internal commands
         if (command()) continue
 
