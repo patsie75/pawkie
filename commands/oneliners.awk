@@ -14,8 +14,14 @@ BEGIN {
 ## return a list of oneliners configures (uses: config[])
 function _oneliners(str,    reply, cmd, args, arr, i) {
   reply = ""
-  cmd = substr(str, 1, index(str, " ")-1)
-  args = substr(str, index(str, " ")+1)
+
+  if (index(str, " ")) {
+    cmd = substr(str, 1, index(str, " ")-1)
+    args = substr(str, index(str, " ")+1)
+  } else {
+    cmd = str
+    args = ""
+  }
 
   dbg(5, "oneliners", sprintf("cmd: \"%s\" args: \"%s\"", cmd, args))
 
@@ -51,27 +57,23 @@ function _oneliners(str,    reply, cmd, args, arr, i) {
   if (reply) return(reply)
 }
 
-
-function _onelinerAction(cmd,   arr, i, trgt) {
-  dbg(5, "onelinerAction", sprintf("cmd: \"%s\"", cmd))
-  split(var["config"]["oneliners"], arr, " ")
+function _onelinerAction(cmd,   onesies, trgt, rnd) {
+  dbg(5, "onelineraction", sprintf("cmd: \"%s\"", cmd))
+  split(var["config"]["oneliners"], onesies, " ")
 
   trgt = tolower("onelineraction,"var["irc"]["target"])
-  if (var["system"]["now"] >= var["timer"][trgt]) {
-    for (i in arr) {
-      if (cmd == arr[i]) {
-        dbg(5, "onelinerAction", sprintf("found match for cmd: \"%s\"", cmd))
-        if (!var["data"][cmd][0]) loadText(cmd)
-        rnd = int(rand() * var["data"][cmd][0]) + 1
+  if (inArray(cmd, onesies)) {
+    dbg(5, "onelineraction", sprintf("found match for cmd: \"%s\"", cmd))
+    if ( (var["system"]["now"] >= var["timer"][trgt]) || var["system"]["sudo"]) {
+      if (!var["data"][cmd][0]) loadText(cmd)
+      rnd = int(rand() * var["data"][cmd][0]) + 1
 
-        if ("onelineraction" in var["timers"])
-          var["timer"][trgt] = var["system"]["now"] + var["timers"]["onelineraction"]
+      if ("onelineraction" in var["timers"])
+        var["timer"][trgt] = var["system"]["now"] + var["timers"]["onelineraction"]
 
-        dbg(5, "onelinerAction", sprintf("responding: \"%s\"", var["data"][cmd][rnd]))
-        return(var["data"][cmd][rnd])
-      }
-    }
-    dbg(5, "onelinerAction", sprintf("cmd: \"%s\" not found", cmd))
-  } else dbg(4, "onelineraction", sprintf("timer[%s] %s has not yet passed %s", trgt, strftime("%T"), strftime("%T", var["timer"][trgt])))
+      dbg(5, "onelineraction", sprintf("response #%d/%d: \"%s\"", rnd, var["data"][cmd][0], var["data"][cmd][rnd]))
+      return(var["data"][cmd][rnd])
+    } else dbg(4, "onelineraction", sprintf("timer[%s] %s has not yet passed %s", trgt, strftime("%T"), strftime("%T", var["timer"][trgt])))
+  } else dbg(5, "onelineraction", sprintf("cmd: \"%s\" not found", cmd))
 }
 

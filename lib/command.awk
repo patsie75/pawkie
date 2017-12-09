@@ -16,8 +16,8 @@ function command(   cmd, perm, time, call, n, i, output) {
       # commands have minimum interval between runs
       if (cmd in var["timers"]) {
         trgt = tolower(cmd","var["irc"]["target"])
-        if ( (systime() >= var["timer"][trgt]) || var["system"]["sudo"]) {
-          var["timer"][trgt] = systime() + var["timers"][cmd]
+        if ( (var["system"]["now"] >= var["timer"][trgt]) || var["system"]["sudo"]) {
+          var["timer"][trgt] = var["system"]["now"] + var["timers"][cmd]
           time = 1
         } else dbg(4, "command", sprintf("timer[%s] %s has not yet passed %s", trgt, strftime("%T"), strftime("%T", var["timer"][trgt])))
       } else time = 1

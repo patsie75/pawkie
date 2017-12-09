@@ -4,13 +4,10 @@ BEGIN {
   var["timers"]["sudo"] = 5
 
   var["help"]["sudo"] = "Run a command without timer limitation"
-  var["usage"]["sudo"] = "<cmd> [<args>]"
+  var["usage"]["sudo"] = "[<cmd> [<args>]]"
 }
 
 function _sudo(str) {
-  # set sudo flag
-  var["system"]["sudo"] = 1
-
   if (str) {
     # replace cmd + args
     if (index(str, " ")) {
@@ -26,11 +23,19 @@ function _sudo(str) {
     var["irc"]["args"] = var["irc"]["prev"]["args"]
   }
 
-  # run new command (as long as it is not sudo again..)
+  # process possible aliases
   alias()
-  if (var["irc"]["cmd"] != "sudo")
-    command()
 
-  # unset sudo flag
-  var["system"]["sudo"] = 0
+  # run new command (as long as it is not sudo again..)
+  if (var["irc"]["cmd"] != "sudo") {
+    var["system"]["sudo"] = 1
+
+    # handle command or oneliners
+    if (! command()) {
+      out = _onelinerAction(var["irc"]["cmd"])
+      if (out) msg(vsub(out))
+    }
+
+    var["system"]["sudo"] = 0
+  }
 }

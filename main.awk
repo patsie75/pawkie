@@ -97,8 +97,8 @@ BEGIN {
       continue
     }
 
+    ## parse input data
     if (match($0, /^:([^ ]+) ([0-9A-Z]+) ([^ :]+)? ?:?(.*)$/, raw)) {
-      # parse input data
       var["irc"]["raw"] = $0
       parse(raw)
   
@@ -111,16 +111,15 @@ BEGIN {
 #      for (w in var["irc"]["argv"]) s = s" "w":\""var["irc"]["argv"][w]"\""
 #      dbg(6, "main", sprintf("%s", s))
 
-      # process aliasses first
-      alias()
-
       # handle commands
-      #if (var["irc"]["cmd"] && var["irc"]["channel"]) {
       if (var["irc"]["cmd"] && var["irc"]["target"]) {
-        # handle internal commands
+        # process aliasses first
+        alias()
+
+        # then internal commands
         if (command()) continue
 
-        # handle oneliners
+        # finally oneliners (if no command was found)
         out = _onelinerAction(var["irc"]["cmd"])
         if (out) {
           msg(vsub(out))
@@ -128,21 +127,13 @@ BEGIN {
         }
       }
 
-
       # handle non-commands
       if (!var["irc"]["cmd"] && var["irc"]["channel"]) {
         # handle configured actions
         action()
 
-        # Add text to mimic library
+        # add text to mimic library
         mimicAddLine(var["irc"]["msg"])
-        var["system"]["mimiccnt"]++
-        if (var["system"]["mimiccnt"] % 100 == 0) {
-          mimicCleanup()
-          var["system"]["mimiccnt"] = 0
-        }
-        if (var["system"]["mimiccnt"] % 10 == 0)
-          saveArray("mimic.dat")
       }
     }
   }

@@ -63,11 +63,22 @@ function mimicAddLine(line,   i, n, l, min, max, word, words, key) {
     }
   }
 
+  ## keep counter to cleanup and save DB regularly
+  var["system"]["mimiccnt"]++
+  if (var["system"]["mimiccnt"] % 10 == 0)
+    saveArray("mimic.dat")
+
+  if (var["system"]["mimiccnt"] % 100 == 0) {
+    mimicCleanup()
+    var["system"]["mimiccnt"] = 0
+  }
+
 }
 
 
 ## clean up the mimic dictionary
-#function mimicCleanup(dict) {
+function mimicCleanup(dict) {
+  dbg(3, "mimicCleaup", "Not implemented yet")
 #  delete newdict
 #  oldKeyNr = newKeyNr = oldTotal = newTotal = 0
 #
@@ -113,5 +124,5 @@ function mimicAddLine(line,   i, n, l, min, max, word, words, key) {
 #  t2 = preciseTime()
 #  printf("mimicCleanup(): Reduced number of keys from %d to %d and total words from %d to %d in %.2f seconds\n", oldKeyNr, newKeyNr, oldTotal, newTotal, t2-t1)
 #
-#}
+}
 
